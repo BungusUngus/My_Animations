@@ -17,10 +17,13 @@ public class ThirdPersonController : MonoBehaviour
     public float jumpForce = 4;
     public bool grounded = true;
 
+    private Animator ani;
+
     //object references are good to put within Awake() rather than Start()
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        ani = GetComponentInChildren<Animator>();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -71,12 +74,18 @@ public class ThirdPersonController : MonoBehaviour
         //MOVE TOWARDS -- lerping with a set step
         if (movementVector.magnitude > 0)
         {
-            speed = Mathf.MoveTowards(speed, Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed, 1 * Time.deltaTime);
+            speed = Mathf.MoveTowards(speed, Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed, 2 * Time.deltaTime);
         }
         else
         {
             speed = Mathf.MoveTowards(speed, 0, 5 * Time.deltaTime);
         }
+        //Animation Updates
+        ani.SetBool("walking?", movementVector.magnitude > 0);
+        ani.SetBool("running?", Input.GetKey(KeyCode.LeftShift));
+        ani.SetBool("locked?", Input.GetMouseButton(1));
+        ani.SetFloat("x", Input.GetAxis("Horizontal") * (Input.GetKey(KeyCode.LeftShift) ? 2 : 1 ));
+        ani.SetFloat("z", Input.GetAxis("Vertical") * (Input.GetKey(KeyCode.LeftShift) ? 2 : 1 ));
     }
     
     //FixedUpdate() doesn't happen per frame instead updates at a fixed interval, use FixedUpdate() for physics based operations
